@@ -1,0 +1,132 @@
+<!doctype html>
+<html class="no-js" lang="es-es">
+
+<head>
+  <meta charset="utf-8">
+  <title>Test sample 1</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <style>
+    body{
+      margin: 1rem;
+      text-align: center;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+          }
+      }
+    };
+    
+    let feature_layer = getUrlParameter('featureLayer');
+    let file_name = getUrlParameter('fileName');
+
+    if(!feature_layer){
+      feature_layer = "https://services7.arcgis.com/lTrEzFGSU2ayogtj/arcgis/rest/services/COMPLETA_Afectados_por_coronavirus_por_provincia_en_Espa%C3%B1a_Vista_Solo_lectura/FeatureServer/0";
+    }
+    if(!file_name){
+      file_name = "afectados_por_coronavirus_por_provincia.csv";
+    }
+
+    let forceDL = function(fields, data){
+
+      let csv = '',
+          fieldsLen = fields.length,
+          dataLen = data.length,
+          fieldsArray = [];
+
+      for(i = 0; i < fieldsLen; i++){
+        csv += `"${fields[i].name}"`;
+        fieldsArray.push(fields[i].name);
+
+        if(i === (fieldsLen - 1)){
+          csv += '\n';
+        }else{
+          csv += ',';
+        }
+      }
+
+      let fieldsArrayLen = fieldsArray.length;
+
+      for(i = 0; i < dataLen; i++){
+        for(j = 0; j < fieldsArrayLen; j++){
+          csv += `"${data[i].fieldsArray[j]}"`;
+
+          if(j === (fieldsArrayLen - 1)){
+            csv += '\n';
+          }else{
+            csv += ',';
+          }
+        }
+      }
+      
+      var dlAnchorElem = document.getElementById('btnDownload');
+      dlAnchorElem.setAttribute("href","data:text/csv,"+     encodeURIComponent(csv)     );
+      dlAnchorElem.setAttribute("download", file_name);
+      setTimeout(function(){dlAnchorElem.click();}, 3000)
+    }
+
+    let getAllFeatures = function(config){
+      if(!config){
+        config = {
+          features: [],
+          offset: 0
+        }
+      }
+
+      $.ajax({
+        dataType: "json",
+        url: `${feature_layer}/query`,
+        data: {
+          'where': '1=1',
+          'outFields': '*',
+          'returnGeometry': false,
+          'resultOffset': config.offset ,
+          'returnExceededLimitFeatures': true,
+          'f': 'pjson'
+        }
+      }).done(function(data){
+        
+        let concatFeatures = config.features.concat(data.features);
+        if(data.exceededTransferLimit === true){
+          getAllFeatures({
+            features: concatFeatures,
+            offset: config.offset + data.features.length
+          });
+
+        }else{
+          forceDL(data.fields, concatFeatures);
+        }
+      });
+    }
+    getAllFeatures();
+
+  </script>
+
+</head>
+
+<body>
+
+  <a id="btnDownload"><strong>Ejecutando script...</strong> <br>Espere unos segundos</a>
+  
+</body>
+
+</html>
