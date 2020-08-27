@@ -6,11 +6,6 @@
   <title>Test sample 1</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <link rel="manifest" href="site.webmanifest">
-  <link rel="apple-touch-icon" href="icon.png">
-
-  <link rel="stylesheet" href="css/normalize.css">
   <style>
     body{
       margin: 1rem;
@@ -19,20 +14,20 @@
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<script>
+  <script>
 
     var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+      var sPageURL = window.location.search.substring(1),
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i;
 
       for (i = 0; i < sURLVariables.length; i++) {
-          sParameterName = sURLVariables[i].split('=');
+        sParameterName = sURLVariables[i].split('=');
 
-          if (sParameterName[0] === sParam) {
-              return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-          }
+        if (sParameterName[0] === sParam) {
+          return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
       }
     };
     
@@ -49,9 +44,9 @@
     let forceDL = function(fields, data){
 
       let csv = '',
-          fieldsLen = fields.length,
-          dataLen = data.length,
-          fieldsArray = [];
+      fieldsLen = fields.length,
+      dataLen = data.length,
+      fieldsArray = [];
 
       for(i = 0; i < fieldsLen; i++){
         csv += `"${fields[i].name}"`;
@@ -68,7 +63,7 @@
 
       for(i = 0; i < dataLen; i++){
         for(j = 0; j < fieldsArrayLen; j++){
-          csv += `"${data[i].fieldsArray[j]}"`;
+          csv += `"${data[i].attributes[j]}"`;
 
           if(j === (fieldsArrayLen - 1)){
             csv += '\n';
